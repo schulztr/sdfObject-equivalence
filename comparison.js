@@ -1,5 +1,5 @@
 const COMMON_KEYS = ["sdfRef", "sdfRequired"]//without description, $comment and label
-const DATA_KEYS = ["type", "const", "default", "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum", "multipleOf", "minLength", "maxLength", "minItems", "maxItems", "uniqueItems", "pattern", "format", "required", "properties", "unit", "readable", "writable", "observable", "nullable", "contentFormat", "sdfChoice", "enum"];
+const DATA_KEYS = ["type", "const", "default", "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum", "multipleOf", "minLength", "maxLength", "minItems", "maxItems", "uniqueItems", "pattern", "format", "required", "properties", "unit", "readable", "writable", "observable", "nullable", "contentFormat", "sdfType", "sdfChoice", "enum"];
 const SDF_TYPE_KEYS = ["byte-string", "unix-time"];
 
 exports.sdfObject = function (obj1, obj2) {
@@ -93,7 +93,7 @@ function sdfProperty(key1, property1, key2, property2) {
     if (COMMON_KEYS.map(key => commonQualitiy(key, property1[key], property2[key])).some(v => v == false))
         return false;
 
-    if (DATA_KEYS.map(key => dataQualitiy(property1[key], property2[key])).some(v => v == false))
+    if (DATA_KEYS.map(key => dataQuality(key, property1[key], property2[key])).some(v => v == false))
         return false;
 
     return true;
@@ -123,7 +123,7 @@ function sdfEvent(key1, event1, key2, event2) {
     if (COMMON_KEYS.map(key => commonQualitiy(key, event1[key], event2[key2]).some(v => v == false)))
         return false;
 
-    if (DATA_KEYS.map(key => dataQualitiy(key, event1[key], event2[key])).some(v => v == false))
+    if (DATA_KEYS.map(key => dataQuality(key, event1[key], event2[key])).some(v => v == false))
         return false;
 
     return true;
@@ -170,7 +170,7 @@ function sdfAction(key1, action1, key2, action2) {
     if (COMMON_KEYS.map(key => commonQualitiy(key, action1[key], action2[key2]).some(v => v == false)))
         return false;
 
-    if (DATA_KEYS.map(key => dataQualitiy(key, action1[key], action2[key])).some(v => v == false))
+    if (DATA_KEYS.map(key => dataQuality(key, action1[key], action2[key])).some(v => v == false))
         return false;
 
     return true;
@@ -183,7 +183,7 @@ function commonQualitiy(key, quality1, quality2) {
     if (!(quality1 && quality2))
         return false
 
-    switch(key){
+    switch (key) {
         case "sdfRef":
             return sdfRef(quality1[key], quality2[key]);
         case "sdfRequired":
@@ -193,19 +193,78 @@ function commonQualitiy(key, quality1, quality2) {
     }
 }
 
-function dataQualitiy(key, quality1, quality2) {//ToDo: check for null
-    return true;
+function dataQuality(key, quality1, quality2) {
+    if (!(quality1 || quality2))
+        return true;
+    if (!(quality1 && quality2)) {
+        return false;
+    }
+
+    number_cmp = ["minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum", "multipleOf", "minLength", "maxLength", "minItems", "maxItems", "uniqueItems", "scaleMinimum", "scaleMaximum", "readable", "writable", "nullable"];//number or boolean
+    str_cmp = ["type", "pattern", "format", "unit", "contentFormat"]//string
+    value_cmp = ["const", "default"]//allowed value
+
+    switch (true) {
+        case number_cmp.includes(key):
+            return quality1 == quality2;
+        case str_cmp.includes(key):
+            if (quality1.localeCompare(quality2))
+                return false;
+            else
+                return true;
+        case value_cmp.includes(key):
+            return;
+        case key.localeCompare("items"):
+            return dq_items(quality1, quality2);
+        case key.localeCompare("required"):
+            return dq_required(quality1, quality2);
+        case key.localeCompare("properties"):
+            return dq_properties(quality1, quality2);
+        case key.localeCompare("sdfType"):
+            if (typeof (quality1) === 'string' && typeof (quality2) === 'string')
+                return quality1.localeCompare(quality2) === 0 ? true : false;
+            else if (typeof (quality1) === 'number' && typeof (quality2) === 'number')
+                return quality1 == quality2;
+            else
+                return false;
+        case key.localeCompare("sdfChoice"):
+            return sdfChoice(quality1, quality2);
+        case key.localeCompare("enum"):
+            return dq_enum(quality1, quality2);
+    }
+
+    return Error(`${key} is not a data quality`);
 }
 
 function sdfIOData(key1, IOData1, key2, IOData2) {
     return true;
 }
 
-function sdfRef(ref1, ref2){
+function sdfRef(ref1, ref2) {
     return true;
 }
 
-function sdfRequired(req1, req2){
+function sdfRequired(req1, req2) {
+    return true;
+}
+
+function dq_items(item1, item2) {
+    return true;
+}
+
+function dq_required(req1, req2) {
+    return true;
+}
+
+function dq_properties(prop1, prop2) {
+    return true;
+}
+
+function sdfChoice(choice1, choice2) {
+    return true;
+}
+
+function dq_enum(enum1, enum2) {
     return true;
 }
 
