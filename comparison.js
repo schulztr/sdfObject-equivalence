@@ -1,6 +1,6 @@
 const COMMON_KEYS = ["sdfRef", "sdfRequired"]//without description, $comment and label
 const DATA_KEYS = ["type", "const", "default", "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum", "multipleOf", "minLength", "maxLength", "minItems", "maxItems", "uniqueItems", "pattern", "format", "required", "properties", "unit", "readable", "writable", "observable", "nullable", "contentFormat", "sdfType", "sdfChoice", "enum"];
-const SDF_TYPE_KEYS = ["byte-string", "unix-time"];
+const CLASS_KEYS = ["sdfObject", "sdfProperty", "sdfAction", "sdfEvent", "sdfData"]
 
 exports.sdfObject = function (obj1, obj2) {
     key1 = Object.keys(obj1)[0];
@@ -185,9 +185,9 @@ function commonQualitiy(key, quality1, quality2) {
 
     switch (key) {
         case "sdfRef":
-            return sdfRef(quality1[key], quality2[key]);
+            return sdfRef(quality1, quality2);
         case "sdfRequired":
-            return sdfRequired(quality1[key], quality2[key]);
+            return sdfRequired(quality1, quality2);
         default:
             throw Error("Invalid key");
     }
@@ -245,7 +245,56 @@ function sdfRef(ref1, ref2) {
 }
 
 function sdfRequired(req1, req2) {
+    if (!(req1 || req2))
+        return true;
+    if (!(req1 && req2))
+        return false;
+
+    if (req1.length != req2.length)
+        return false;
+
+    //split to array of keys
+    req1 = req1.map(elem => elem.split('/'));
+    req2 = req2.map(elem => elem.split('/'));
+
+    req1.forEach(e => e.shift());
+    req2.forEach(e => e.shift())
+
+    for (i1 = 0; i1 < req1.length; i1++) {
+        equal = false
+        for (i2 = 0; i2 < req2.length; i2++) {
+            if (req_items(req1[i1], req2[i2])) {//could get expensive
+                equal = true;
+                delete req1[i1];
+                delete req2[i2];
+                break;
+            }
+
+        }
+        if (!equal) {
+            return false;
+        }
+        equal = false;
+    }
+
     return true;
+}
+
+function req_items(p1, p2) {
+    if (!(p1 || p2))
+        return true;
+    if (!(p1 && p2))
+        return false;
+
+    if (p1.length != p2.length)
+        return false;
+
+    return p1.map((e, i) => {
+        if (CLASS_KEYS.includes(e))
+            return e.localeCompare(p2[i]) == 0 ? true : false;
+
+        return className(e, p2[i]);
+    }).every(v => v == true);
 }
 
 function dq_items(item1, item2) {
