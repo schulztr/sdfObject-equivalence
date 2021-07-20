@@ -298,6 +298,36 @@ function req_items(p1, p2) {
 }
 
 function dq_items(item1, item2) {
+    if (!(item1 || item2))
+        return true;
+
+    if (!(item1 && item2))
+        return false;
+
+    keys1 = Object.keys(item1).sort();
+    keys2 = Object.keys(item2).sort();
+
+    if (keys1.length != keys.length)
+        return false;
+
+    for (i = 0; i < keys1.length; i++) {
+        if (!keys1[i].localeCompare(keys[i]))
+            return false;
+
+        key = keys1[i]
+        if (key in COMMON_KEYS)
+            if (commonQualitiy(key, item1[key], item2[key]))
+                break;
+            else
+                return false
+        else if (key in DATA_KEYS)
+            if (dataQuality(key, item1[key], item2[key]))
+                break;
+            else
+                return false;
+        else
+            throw Error("unknown key");
+    }
     return true;
 }
 
