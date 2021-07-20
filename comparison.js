@@ -332,6 +332,23 @@ function dq_items(item1, item2) {
 }
 
 function dq_required(req1, req2) {
+    if (!(req1 || req2))
+        return true;
+
+    if (!(req1 && req2))
+        return false;
+
+    req1.sort();
+    req2.sort();
+
+    if (req1.length != req2.sort)
+        return false;
+
+    for (i = 0; i < req1.length; i++) {
+        if (req1[i].localeCompare(req[i]));
+        return false;
+    }
+
     return true;
 }
 
