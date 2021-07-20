@@ -1,6 +1,8 @@
 const fs = require('fs');
 const commandLineArgs = require('command-line-args');
-var cmp = require('./comparison')
+
+const cmp = require('./comparison');
+const res = require('./resolve');
 
 const optionDefinitions = [
     { name: 'input', type: String, multiple: true, defaultOption: true}
@@ -18,7 +20,23 @@ function getObject(sdfFile) {
     return sdfFile.sdfObject
 }
 
-const sdfObj1 = getObject(JSON.parse(fs.readFileSync(options.input[0])));
-const sdfObj2 = getObject(JSON.parse(fs.readFileSync(options.input[1])));
+function getNamespace(sdfFile) {
+    if(!sdfFile)
+        throw Error("Need two arguments");
 
-console.log(cmp.sdfObject(sdfObj1, sdfObj2));
+    if(!sdfFile.namespace)
+        return {};
+    
+    return sdfFile.namespace;
+}
+
+const sdfFile1 = JSON.parse(fs.readFileSync(options.input[0]));
+const sdfFile2 = JSON.parse(fs.readFileSync(options.input[1]));
+
+const namespace1 = getNamespace(sdfFile1);
+const namespace2 = getNamespace(sdfFile2);
+
+const sdfObj1 = getObject(sdfFile1);
+const sdfObj2 = getObject(sdfFile2);
+
+console.log(cmp.sdfObject(res.resolveRef(namespace1, sdfObj1), res.resolveRef(namespace2, sdfObj2)));
