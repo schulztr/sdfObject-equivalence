@@ -1,5 +1,5 @@
-const COMMON_KEYS = ["sdfRef", "sdfRequired"]//without description, $comment and label
-const DATA_KEYS = ["type", "const", "default", "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum", "multipleOf", "minLength", "maxLength", "minItems", "maxItems", "uniqueItems", "pattern", "format", "required", "properties", "unit", "readable", "writable", "observable", "nullable", "contentFormat", "sdfType", "sdfChoice", "enum"];
+const COMMON_KEYS = ["sdfRef", "sdfRequired", "description"]//ToDo remove description when resolve is implemented
+const DATA_KEYS = ["type", "const", "default", "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum", "multipleOf", "minLength", "maxLength", "minItems", "maxItems", "uniqueItems", "pattern", "format", "required", "properties", "unit", "readable", "writable", "observable", "nullable", "contentFormat", "sdfType", "sdfChoice"];
 const CLASS_KEYS = ["sdfObject", "sdfProperty", "sdfAction", "sdfEvent", "sdfData"]
 
 exports.sdfObject = function (obj1, obj2) {
@@ -200,6 +200,8 @@ function commonQualitiy(key, quality1, quality2) {
             return sdfRef(quality1, quality2);
         case "sdfRequired":
             return sdfRequired(quality1, quality2);
+        case "description":
+            return true;
         default:
             throw Error("Invalid key");
     }
@@ -227,8 +229,12 @@ function dataQuality(key, quality1, quality2) {
             return true;
         }
     }
-    else if (value_cmp.includes(key)) {//ToDo
-        return true;
+    else if (value_cmp.includes(key)) {
+        if(typeof(quality1) === 'string' && typeof(quality2) === 'string'){
+            return quality1.localeCompare(quality2)==0 ? true : false;
+        } else {
+            return quality1 === quality2;
+        }
     }
     else if (!key.localeCompare("items")) {
         return dq_items(quality1, quality2);
@@ -249,9 +255,6 @@ function dataQuality(key, quality1, quality2) {
     }
     else if (!key.localeCompare("sdfChoice")) {
         return sdfChoice(quality1, quality2);
-    }
-    else if (!key.localeCompare("enum")) {
-        return dq_enum(quality1, quality2);
     } else {
         throw Error(`${key} is not a data quality`);
     }
@@ -430,10 +433,42 @@ function dq_properties(prop1, prop2) {
 }
 
 function sdfChoice(choice1, choice2) {
-    return true;
-}
-
-function dq_enum(enum1, enum2) {
+    if(Object.entries(choice1).length!=Object.entries(choice2).length){
+        console.log(`sdfChoice: number of elements differs`);
+        return false;
+    }
+    
+    for(const key1 in choice1){
+        equal = false;
+        prop1_k = Object.keys(choice1[key1]).sort();
+        for(const key2 in choice2){
+            prop2_k = Object.keys(choice2[key2]).sort();
+            if(prop1_k.length!=prop2_k.length){
+                return false;
+            }
+            
+            if(prop1_k.map((q1_k, i) => {
+                if(q1_k.localeCompare(prop2_k[i])){
+                    return false;
+                }else{
+                    if(COMMON_KEYS.includes(q1_k)){
+                        return commonQualitiy(q1_k, choice1[key1][q1_k], choice2[key2][prop2_k[i]]);
+                    }else if(DATA_KEYS.includes(q1_k)){
+                        return dataQuality(q1_k, choice1[key1][q1_k], choice2[key2][prop2_k[i]]);                        
+                    } else{
+                        throw Error(`${q1_k} no common or data quality`)
+                    }
+                }
+            }).every(v => v==true)){
+                equal = true;
+            }
+        }
+        if(!equal){
+            console.log(`sdfChoice: ${choice1[key1]} differs`);
+            return false;
+        }
+        equal = false;
+    }
     return true;
 }
 

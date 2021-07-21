@@ -39,4 +39,4 @@ const namespace2 = getNamespace(sdfFile2);
 const sdfObj1 = getObject(sdfFile1);
 const sdfObj2 = getObject(sdfFile2);
 
-console.log(cmp.sdfObject(res.resolveRef(namespace1, sdfObj1), res.resolveRef(namespace2, sdfObj2)));
+console.log(cmp.sdfObject(res.resolve(namespace1, sdfObj1), res.resolve(namespace2, sdfObj2)));
