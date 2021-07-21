@@ -1,13 +1,13 @@
 exports.resolve = function (ns, obj) {
-    return eraseUnusedQualities(resolveEnums(resolveRef(ns, obj)));
+    return unify(resolveRef(ns, obj));
 }
 
 /**
- * Converts all enums to sdfChoice.
+ * Converts all enums to sdfChoice and removes label, description and $comment.
  * @param {*} obj The object with enums
  * @returns Object without enums.
  */
-function resolveEnums(obj) {
+function unify(obj) {
     Object.keys(obj).forEach((key) => {
         if (!key.localeCompare("enum")) {
             if (Object.keys(obj).includes("sdfChoice")) {
@@ -25,14 +25,20 @@ function resolveEnums(obj) {
             obj.sdfChoice = sdfChoice;
 
         }
+        else if (!key.localeCompare("label"))
+            delete obj.label;
+        else if (!key.localeCompare("description"))
+            delete obj.description;
+        else if (!key.localeCompare("$comment"))
+            delete obj["$comment"];
         switch (typeof (obj[key])) {
             case 'undefined':
                 break;
             case 'object':
-                resolveEnums(obj[key]);
+                unify(obj[key]);
                 break;
             case 'array':
-                obj[key].forEach(o => resolveEnums(o));
+                obj[key].forEach(o => unify(o));
 
         }
     });
@@ -47,9 +53,5 @@ function resolveEnums(obj) {
  * @returns An object with resolved references.
  */
 function resolveRef(ns, obj) {
-    return obj;
-}
-
-function eraseUnusedQualities(obj) {
     return obj;
 }
