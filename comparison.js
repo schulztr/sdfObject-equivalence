@@ -24,12 +24,12 @@ exports.sdfObject = function (obj1, obj2) {
                 break;
             }
         }
-        if (!equal){
+        if (!equal) {
             return false;
         }
         equal = false;
     }
-    if (obj2.sdfProperty && Object.entries(obj2.sdfProperty).length != 0){
+    if (obj2.sdfProperty && Object.entries(obj2.sdfProperty).length != 0) {
         return false;
     }
     delete obj1.sdfProperty;
@@ -46,12 +46,12 @@ exports.sdfObject = function (obj1, obj2) {
                 break;
             }
         }
-        if (!equal){
+        if (!equal) {
             return false;
         }
         equal = false;
     }
-    if (obj2.sdfEvent && Object.entries(obj2.sdfEvent).length != 0){
+    if (obj2.sdfEvent && Object.entries(obj2.sdfEvent).length != 0) {
         return false;
     }
     delete obj1.sdfEvent;
@@ -97,7 +97,7 @@ function sdfProperty(key1, property1, key2, property2) {
     if (COMMON_KEYS.map(key => commonQualitiy(key, property1[key], property2[key])).some(v => v == false))
         return false;
 
-    if (DATA_KEYS.map(key => dataQuality(key, property1[key], property2[key])).some(v => v == false)){
+    if (DATA_KEYS.map(key => dataQuality(key, property1[key], property2[key])).some(v => v == false)) {
         console.log(`property ${key1} not equivalent`);
         return false;
     }
@@ -123,17 +123,17 @@ function sdfEvent(key1, event1, key2, event2) {
         if (!equal)
             return false;
     }
-    if (event2.sdfOutputData && Object.entries(event2.sdfOutputData).length != 0){
+    if (event2.sdfOutputData && Object.entries(event2.sdfOutputData).length != 0) {
         console.log("Event: output data not equivalent")
         return false;
     }
 
-    if (COMMON_KEYS.map(key => commonQualitiy(key, event1[key], event2[key2]).some(v => v == false))){
+    if (COMMON_KEYS.map(key => commonQualitiy(key, event1[key], event2[key2]).some(v => v == false))) {
         console.log("Event: common qualities not equivalent");
         return false;
     }
 
-    if (DATA_KEYS.map(key => dataQuality(key, event1[key], event2[key])).some(v => v == false)){
+    if (DATA_KEYS.map(key => dataQuality(key, event1[key], event2[key])).some(v => v == false)) {
         console.log("Event: data qualities not equivalent");
         return false;
     }
@@ -222,16 +222,16 @@ function dataQuality(key, quality1, quality2) {
         return quality1 == quality2;
     }
     else if (str_cmp.includes(key)) {
-        if (quality1.localeCompare(quality2)){
+        if (quality1.localeCompare(quality2)) {
             return false;
         }
-        else{
+        else {
             return true;
         }
     }
     else if (value_cmp.includes(key)) {
-        if(typeof(quality1) === 'string' && typeof(quality2) === 'string'){
-            return quality1.localeCompare(quality2)==0 ? true : false;
+        if (typeof (quality1) === 'string' && typeof (quality2) === 'string') {
+            return quality1.localeCompare(quality2) == 0 ? true : false;
         } else {
             return quality1 === quality2;
         }
@@ -363,15 +363,15 @@ function dq_required(req1, req2) {
     if (!(req1 && req2))
         return false;
 
+    if (req1.length != req2.length)
+        return false;
+
     req1.sort();
     req2.sort();
 
-    if (req1.length != req2.sort)
-        return false;
-
     for (i = 0; i < req1.length; i++) {
-        if (req1[i].localeCompare(req[i]));
-        return false;
+        if (req1[i].localeCompare(req[i]))
+            return false;
     }
 
     return true;
@@ -395,12 +395,12 @@ function dq_properties(prop1, prop2) {
             sub_prop1_k = Object.keys(sub_prop1).sort();
             sub_prop2_k = Object.keys(sub_prop2).sort();
 
-            if (sub_prop1_k.length != sub_prop2_k.length){
+            if (sub_prop1_k.length != sub_prop2_k.length) {
                 return false;
             }
 
             for (i = 0; i < sub_prop1_k.length; i++) {
-                if (sub_prop1_k[i].localeCompare(sub_prop2_k[i])){
+                if (sub_prop1_k[i].localeCompare(sub_prop2_k[i])) {
                     return false;
                 }
 
@@ -424,7 +424,7 @@ function dq_properties(prop1, prop2) {
             }
             equal = true;
         }
-        if (!equal){
+        if (!equal) {
             return false;
         }
         equal = false;
@@ -433,37 +433,37 @@ function dq_properties(prop1, prop2) {
 }
 
 function sdfChoice(choice1, choice2) {
-    if(Object.entries(choice1).length!=Object.entries(choice2).length){
+    if (Object.entries(choice1).length != Object.entries(choice2).length) {
         console.log(`sdfChoice: number of elements differs`);
         return false;
     }
-    
-    for(const key1 in choice1){
+
+    for (const key1 in choice1) {
         equal = false;
         prop1_k = Object.keys(choice1[key1]).sort();
-        for(const key2 in choice2){
+        for (const key2 in choice2) {
             prop2_k = Object.keys(choice2[key2]).sort();
-            if(prop1_k.length!=prop2_k.length){
+            if (prop1_k.length != prop2_k.length) {
                 return false;
             }
-            
-            if(prop1_k.map((q1_k, i) => {
-                if(q1_k.localeCompare(prop2_k[i])){
+
+            if (prop1_k.map((q1_k, i) => {
+                if (q1_k.localeCompare(prop2_k[i])) {
                     return false;
-                }else{
-                    if(COMMON_KEYS.includes(q1_k)){
+                } else {
+                    if (COMMON_KEYS.includes(q1_k)) {
                         return commonQualitiy(q1_k, choice1[key1][q1_k], choice2[key2][prop2_k[i]]);
-                    }else if(DATA_KEYS.includes(q1_k)){
-                        return dataQuality(q1_k, choice1[key1][q1_k], choice2[key2][prop2_k[i]]);                        
-                    } else{
+                    } else if (DATA_KEYS.includes(q1_k)) {
+                        return dataQuality(q1_k, choice1[key1][q1_k], choice2[key2][prop2_k[i]]);
+                    } else {
                         throw Error(`${q1_k} no common or data quality`)
                     }
                 }
-            }).every(v => v==true)){
+            }).every(v => v == true)) {
                 equal = true;
             }
         }
-        if(!equal){
+        if (!equal) {
             console.log(`sdfChoice: ${choice1[key1]} differs`);
             return false;
         }
