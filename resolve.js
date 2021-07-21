@@ -1,4 +1,4 @@
-exports.resolve = function(ns, obj){
+exports.resolve = function (ns, obj) {
     return eraseUnusedQualities(resolveEnums(resolveRef(ns, obj)));
 }
 
@@ -7,7 +7,36 @@ exports.resolve = function(ns, obj){
  * @param {*} obj The object with enums
  * @returns Object without enums.
  */
-function resolveEnums(obj){
+function resolveEnums(obj) {
+    Object.keys(obj).forEach((key) => {
+        if (!key.localeCompare("enum")) {
+            if (Object.keys(obj).includes("sdfChoice")) {
+                throw Error(`enum ${obj["enum"]} would override sdfChoice ${obj["sdfChoice"]}`);
+            }
+
+            sdfChoice = {};
+            _enum = obj[key];
+            _enum.forEach(elem => {
+                quality = {};
+                quality.const = elem;
+                sdfChoice[elem] = quality;
+            })
+            delete obj.enum
+            obj.sdfChoice = sdfChoice;
+
+        }
+        switch (typeof (obj[key])) {
+            case 'undefined':
+                break;
+            case 'object':
+                resolveEnums(obj[key]);
+                break;
+            case 'array':
+                obj[key].forEach(o => resolveEnums(o));
+
+        }
+    });
+
     return obj;
 }
 
@@ -17,10 +46,10 @@ function resolveEnums(obj){
  * @param {*} obj The object with unresolved references.
  * @returns An object with resolved references.
  */
-function resolveRef(ns, obj){
+function resolveRef(ns, obj) {
     return obj;
 }
 
-function eraseUnusedQualities(obj){
+function eraseUnusedQualities(obj) {
     return obj;
 }
