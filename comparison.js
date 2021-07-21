@@ -14,9 +14,9 @@ exports.sdfObject = function (obj1, obj2) {
     obj2 = obj2[key2];
 
     //sdfProperty
-    for (key1 in obj1.sdfProperty) {
+    for (const key1 in obj1.sdfProperty) {
         equal = false;
-        for (key2 in obj2.sdfProperty) {
+        for (const key2 in obj2.sdfProperty) {
             if (sdfProperty(key1, obj1.sdfProperty[key1], key2, obj2.sdfProperty[key2])) {
                 equal = true;
                 delete obj1.sdfProperty[key1];//ToD: Property and Pro_perty in one object?
@@ -24,12 +24,14 @@ exports.sdfObject = function (obj1, obj2) {
                 break;
             }
         }
-        if (!equal)
+        if (!equal){
             return false;
+        }
         equal = false;
     }
-    if (obj2.sdfProperty && Object.entries(obj2.sdfProperty).length != 0)
+    if (obj2.sdfProperty && Object.entries(obj2.sdfProperty).length != 0){
         return false;
+    }
     delete obj1.sdfProperty;
     delete obj2.sdfProperty;
 
@@ -44,12 +46,14 @@ exports.sdfObject = function (obj1, obj2) {
                 break;
             }
         }
-        if (!equal)
+        if (!equal){
             return false;
+        }
         equal = false;
     }
-    if (obj2.sdfEvent && Object.entries(obj2.sdfEvent).length != 0)
+    if (obj2.sdfEvent && Object.entries(obj2.sdfEvent).length != 0){
         return false;
+    }
     delete obj1.sdfEvent;
     delete obj2.sdfEvent;
 
@@ -93,8 +97,10 @@ function sdfProperty(key1, property1, key2, property2) {
     if (COMMON_KEYS.map(key => commonQualitiy(key, property1[key], property2[key])).some(v => v == false))
         return false;
 
-    if (DATA_KEYS.map(key => dataQuality(key, property1[key], property2[key])).some(v => v == false))
+    if (DATA_KEYS.map(key => dataQuality(key, property1[key], property2[key])).some(v => v == false)){
+        console.log(`property ${key1} not equivalent`);
         return false;
+    }
 
     return true;
 }
@@ -117,14 +123,20 @@ function sdfEvent(key1, event1, key2, event2) {
         if (!equal)
             return false;
     }
-    if (event2.sdfOutputData && Object.entries(event2.sdfOutputData).length != 0)
+    if (event2.sdfOutputData && Object.entries(event2.sdfOutputData).length != 0){
+        console.log("Event: output data not equivalent")
         return false;
+    }
 
-    if (COMMON_KEYS.map(key => commonQualitiy(key, event1[key], event2[key2]).some(v => v == false)))
+    if (COMMON_KEYS.map(key => commonQualitiy(key, event1[key], event2[key2]).some(v => v == false))){
+        console.log("Event: common qualities not equivalent");
         return false;
+    }
 
-    if (DATA_KEYS.map(key => dataQuality(key, event1[key], event2[key])).some(v => v == false))
+    if (DATA_KEYS.map(key => dataQuality(key, event1[key], event2[key])).some(v => v == false)){
+        console.log("Event: data qualities not equivalent");
         return false;
+    }
 
     return true;
 }
@@ -194,9 +206,9 @@ function commonQualitiy(key, quality1, quality2) {
 }
 
 function dataQuality(key, quality1, quality2) {
-    if (!(quality1 || quality2))
+    if (quality1 == null && quality2 == null)
         return true;
-    if (!(quality1 && quality2)) {
+    if (quality1 == null || quality2 == null) {
         return false;
     }
 
@@ -204,37 +216,47 @@ function dataQuality(key, quality1, quality2) {
     str_cmp = ["type", "pattern", "format", "unit", "contentFormat"]//string
     value_cmp = ["const", "default"]//allowed value
 
-    switch (true) {
-        case number_cmp.includes(key):
-            return quality1 == quality2;
-        case str_cmp.includes(key):
-            if (quality1.localeCompare(quality2))
-                return false;
-            else
-                return true;
-        case value_cmp.includes(key):
-            return;
-        case key.localeCompare("items"):
-            return dq_items(quality1, quality2);
-        case key.localeCompare("required"):
-            return dq_required(quality1, quality2);
-        case key.localeCompare("properties"):
-            return dq_properties(quality1, quality2);
-        case key.localeCompare("sdfType"):
-            if (typeof (quality1) === 'string' && typeof (quality2) === 'string')
-                return quality1.localeCompare(quality2) === 0 ? true : false;
-            else if (typeof (quality1) === 'number' && typeof (quality2) === 'number')
-                return quality1 == quality2;
-            else
-                return false;
-        case key.localeCompare("sdfChoice"):
-            return sdfChoice(quality1, quality2);
-        case key.localeCompare("enum"):
-            return dq_enum(quality1, quality2);
+    if (number_cmp.includes(key)) {
+        return quality1 == quality2;
     }
-
-    return Error(`${key} is not a data quality`);
+    else if (str_cmp.includes(key)) {
+        if (quality1.localeCompare(quality2)){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+    else if (value_cmp.includes(key)) {//ToDo
+        return true;
+    }
+    else if (!key.localeCompare("items")) {
+        return dq_items(quality1, quality2);
+    }
+    else if (!key.localeCompare("required")) {
+        return dq_required(quality1, quality2);
+    }
+    else if (!key.localeCompare("properties")) {
+        return dq_properties(quality1, quality2);
+    }
+    else if (!key.localeCompare("sdfType")) {
+        if (typeof (quality1) === 'string' && typeof (quality2) === 'string')
+            return quality1.localeCompare(quality2) === 0 ? true : false;
+        else if (typeof (quality1) === 'number' && typeof (quality2) === 'number')
+            return quality1 == quality2;
+        else
+            return false;
+    }
+    else if (!key.localeCompare("sdfChoice")) {
+        return sdfChoice(quality1, quality2);
+    }
+    else if (!key.localeCompare("enum")) {
+        return dq_enum(quality1, quality2);
+    } else {
+        throw Error(`${key} is not a data quality`);
+    }
 }
+
 
 function sdfIOData(key1, IOData1, key2, IOData2) {
     return true;
@@ -307,26 +329,26 @@ function dq_items(item1, item2) {
     keys1 = Object.keys(item1).sort();
     keys2 = Object.keys(item2).sort();
 
-    if (keys1.length != keys.length)
+    if (keys1.length != keys2.length)
         return false;
 
     for (i = 0; i < keys1.length; i++) {
-        if (!keys1[i].localeCompare(keys[i]))
+        if (!keys1[i].localeCompare(keys2[i]))
             return false;
 
         key = keys1[i]
-        if (key in COMMON_KEYS)
+        if (COMMON_KEYS.includes(key))
             if (commonQualitiy(key, item1[key], item2[key]))
-                break;
+                continue;
             else
                 return false
-        else if (key in DATA_KEYS)
+        else if (DATA_KEYS.includes(key))
             if (dataQuality(key, item1[key], item2[key]))
-                break;
+                continue;
             else
                 return false;
         else
-            throw Error("unknown key");
+            throw Error(`unknown key: ${key}`);
     }
     return true;
 }
@@ -353,6 +375,57 @@ function dq_required(req1, req2) {
 }
 
 function dq_properties(prop1, prop2) {
+    if (!(prop1 || prop2))
+        return true;
+    if (!(prop1 && prop2))
+        return false;
+
+    if (Object.keys(prop1).length != Object.keys(prop2).length)
+        return false;
+    for (key1 in prop1) {
+        equal = false;
+        for (key2 in prop2) {
+            if (!className(key1, key2))//could get expansive
+                continue;
+            sub_prop1 = prop1[key1];
+            sub_prop2 = prop2[key2];
+            sub_prop1_k = Object.keys(sub_prop1).sort();
+            sub_prop2_k = Object.keys(sub_prop2).sort();
+
+            if (sub_prop1_k.length != sub_prop2_k.length){
+                return false;
+            }
+
+            for (i = 0; i < sub_prop1_k.length; i++) {
+                if (sub_prop1_k[i].localeCompare(sub_prop2_k[i])){
+                    return false;
+                }
+
+                k = sub_prop1_k[i];
+                if (COMMON_KEYS.includes(k)) {
+                    if (commonQualitiy(k, sub_prop1[k], sub_prop2[k]))
+                        continue;
+                    else {
+                        return false;
+                    }
+                } else if (DATA_KEYS.includes(k)) {
+                    if (dataQuality(k, sub_prop1[k], sub_prop2[k])) {
+                        continue;
+                    }
+                    else {
+                        return false;
+                    }
+                } else
+                    throw Error(`unknown key: ${k}`);
+
+            }
+            equal = true;
+        }
+        if (!equal){
+            return false;
+        }
+        equal = false;
+    }
     return true;
 }
 
