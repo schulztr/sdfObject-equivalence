@@ -77,7 +77,6 @@ function resolveRef(ns, obj, subObj=obj, location="") {//ToDo dereference input 
 
                 pointer.set(obj, location, new_obj);
             } else {//global pointer
-                console.log(JSON.stringify(ns))
                 ref = ptr.split(":");
                 subObj.sdfRef = ns[ref[0]].concat(ref[1]);
             }
@@ -112,12 +111,14 @@ function resolveIOData(ns,obj, subObj=obj, location="") {
                         new_data.push(new_obj);
                         remove.push(i);
                     } else {//global
-                        //ToDo
+                        ref = ptr.split(":");
+                        new_data.push(ns[ref[0]].concat(ref[1]));
+                        remove.push(i);
                     }
                 }
             });
             offset = 0;
-            for (const i in remove) {
+            for (const i of remove) {
                 subObj.sdfInputData.splice(i - offset, 1);
                 ++offset;
             }
