@@ -7,8 +7,10 @@ exports.sdfObject = function (obj1, obj2) {
     key2 = Object.keys(obj2)[0];
 
     //class name
-    if (!className(key1, key2))
+    if (!className(key1, key2)) {
+        console.log(`Name ${key1} and ${key2} not equal`)
         return false;
+    }
 
     obj1 = obj1[key1];
     obj2 = obj2[key2];
@@ -25,20 +27,22 @@ exports.sdfObject = function (obj1, obj2) {
             }
         }
         if (!equal) {
+            console.log(`Property ${key} differs`);
             return false;
         }
         equal = false;
     }
     if (obj2.sdfProperty && Object.entries(obj2.sdfProperty).length != 0) {
+        console.log(`sdfProperties not equal`);
         return false;
     }
     delete obj1.sdfProperty;
     delete obj2.sdfProperty;
 
     //sdfEvent
-    for (key1 in obj1.sdfEvent) {
+    for (const key1 in obj1.sdfEvent) {
         equal = false;
-        for (key2 in obj2.sdfEvent) {
+        for (const key2 in obj2.sdfEvent) {
             if (sdfEvent(key1, obj1.sdfEvent[key1], key2, obj1.sdfEvent[key2])) {
                 equal = true;
                 delete obj1.sdfEvent[key1];
@@ -47,20 +51,22 @@ exports.sdfObject = function (obj1, obj2) {
             }
         }
         if (!equal) {
+            console.log(`Event ${key1} differs`);
             return false;
         }
         equal = false;
     }
     if (obj2.sdfEvent && Object.entries(obj2.sdfEvent).length != 0) {
+        console.log(`${Object.entries(obj.sdfEvent).length} event(s) differ`)
         return false;
     }
     delete obj1.sdfEvent;
     delete obj2.sdfEvent;
 
     //sdfAction
-    for (key1 in obj1.sdfAction) {
+    for (const key1 in obj1.sdfAction) {
         equal = false;
-        for (key2 in obj2.sdfAction) {
+        for (const key2 in obj2.sdfAction) {
             if (sdfAction(key1, obj1.sdfAction[key1], key2, obj2.sdfAction[key2])) {
                 equal = true;
                 delete obj1.sdfAction[key1];
@@ -68,18 +74,24 @@ exports.sdfObject = function (obj1, obj2) {
                 break;
             }
         }
-        if (!equal)
+        if (!equal) {
+            console.log(`Action ${key1} differs`)
             return false;
+        }
         equal = false;
     }
-    if (obj2.sdfAction && Object.entries(obj2.sdfAction).length != 0)
+    if (obj2.sdfAction && Object.entries(obj2.sdfAction).length != 0) {
+        console.log(`${Object.entries(obj2.sdfAction).length} action(s) differ`)
         return false;
+    }
     delete obj1.sdfAction;
     delete obj2.sdfAction;
 
     //common qualities
-    if (COMMON_KEYS.map(key => commonQualitiy(key, obj1[key], obj2[key])).some(v => v == false))
+    if (COMMON_KEYS.map(key => commonQualitiy(key, obj1[key], obj2[key])).some(v => v == false)) {
+        console.log(`common qualities from ${key1} differ`)
         return false;
+    }
 
     return true;
 }
@@ -179,7 +191,7 @@ function sdfAction(key1, action1, key2, action2) {
     if (action2.sdfOutputData && Object.entries(action2.sdfOutputData).length != 0)
         return false;
 
-    if (COMMON_KEYS.map(key => commonQualitiy(key, action1[key], action2[key2]).some(v => v == false)))
+    if (COMMON_KEYS.map(key => commonQualitiy(key, action1[key], action2[key])).some(v => v == false))
         return false;
 
     if (DATA_KEYS.map(key => dataQuality(key, action1[key], action2[key])).some(v => v == false))
