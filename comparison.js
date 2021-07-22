@@ -27,7 +27,7 @@ exports.sdfObject = function (obj1, obj2) {
             }
         }
         if (!equal) {
-            console.log(`Property ${key} differs`);
+            console.log(`Property ${key1} differs`);
             return false;
         }
         equal = false;
@@ -209,7 +209,7 @@ function commonQualitiy(key, quality1, quality2) {
 
     switch (key) {
         case "sdfRef":
-            return sdfRef(quality1, quality2);
+            return quality1.localeCompare(quality2)==0
         case "sdfRequired":
             return sdfRequired(quality1, quality2);
         case "description":
@@ -243,7 +243,7 @@ function dataQuality(key, quality1, quality2) {
     }
     else if (value_cmp.includes(key)) {
         if (typeof (quality1) === 'string' && typeof (quality2) === 'string') {
-            return quality1.localeCompare(quality2) == 0 ? true : false;
+            return quality1.localeCompare(quality2) == 0;
         } else {
             return quality1 === quality2;
         }
@@ -259,7 +259,7 @@ function dataQuality(key, quality1, quality2) {
     }
     else if (!key.localeCompare("sdfType")) {
         if (typeof (quality1) === 'string' && typeof (quality2) === 'string')
-            return quality1.localeCompare(quality2) === 0 ? true : false;
+            return quality1.localeCompare(quality2) === 0;
         else if (typeof (quality1) === 'number' && typeof (quality2) === 'number')
             return quality1 == quality2;
         else
@@ -328,7 +328,7 @@ function req_items(p1, p2) {
 
     return p1.map((e, i) => {
         if (CLASS_KEYS.includes(e))
-            return e.localeCompare(p2[i]) == 0 ? true : false;
+            return e.localeCompare(p2[i]) == 0;
 
         return className(e, p2[i]);
     }).every(v => v == true);
@@ -456,7 +456,7 @@ function sdfChoice(choice1, choice2) {
         for (const key2 in choice2) {
             prop2_k = Object.keys(choice2[key2]).sort();
             if (prop1_k.length != prop2_k.length) {
-                return false;
+                continue;
             }
 
             if (prop1_k.map((q1_k, i) => {
@@ -476,7 +476,7 @@ function sdfChoice(choice1, choice2) {
             }
         }
         if (!equal) {
-            console.log(`sdfChoice: ${choice1[key1]} differs`);
+            console.log(`sdfChoice: ${JSON.stringify(choice1[key1])} differs`);
             return false;
         }
         equal = false;

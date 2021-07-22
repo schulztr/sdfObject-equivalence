@@ -76,7 +76,9 @@ function resolveRef(ns, obj, subObj, location) {//ToDo dereference input and out
 
                 pointer.set(obj, location, new_obj);
             }else{//global pointer
-
+                console.log(JSON.stringify(ns))
+                ref = subObj[key].split(":");
+                subObj.sdfRef = ns[ref[0]].concat(ref[1]);
             }
         }
 
