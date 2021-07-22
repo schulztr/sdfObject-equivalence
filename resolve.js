@@ -60,33 +60,64 @@ function resolveRef(ns, obj, subObj, location) {//ToDo dereference input and out
             ptr = subObj[key];
             if (!ptr.charAt(0).localeCompare("#")) {//local pointer
                 ptr = ptr.substring(11);
-                new_obj = pointer.get(obj, ptr);
+                new_obj = JSON.parse(JSON.stringify(pointer.get(obj, ptr)));//to get real copy of object
                 old_obj = subObj;
 
                 //merge
                 delete old_obj.sdfRef;
                 Object.keys(old_obj).forEach((key) => {
-                    if(old_obj[key] === null){
-                        delete new_obj[key];
+                    if (old_obj[key] === null) {
+                        delete new_obj[key]
                     }
-                    else{
+                    else {
                         new_obj[key] = old_obj[key];
+
                     }
                 })
 
                 pointer.set(obj, location, new_obj);
-            }else{//global pointer
+            } else {//global pointer
                 console.log(JSON.stringify(ns))
-                ref = subObj[key].split(":");
+                ref = ptr.split(":");
                 subObj.sdfRef = ns[ref[0]].concat(ref[1]);
             }
+        } else if (!key.localeCompare("sdfInputData")) {
+            console.log("hit");
+            new_data = [];
+            remove = []
+            subObj.sdfInputData.forEach((ptr, i) => {
+                if (typeof (ptr) === 'string') {
+                    if (!ptr.charAt(0).localeCompare("#")) {//local
+                        ptr = ptr.substring(11);
+                        new_obj = JSON.parse(JSON.stringify(pointer.get(obj, ptr)));//to get real copy of object
+                        new_data.push(new_obj);
+                        remove.push(i);
+                    } else {//global
+                        //ToDo
+                    }
+                }
+            });
+            offset = 0;
+            for (const i in remove) {
+                subObj.sdfInputData.splice(i - offset, 1);
+                ++offset;
+            }
+            new_data.forEach(elem => subObj.sdfInputData.push(elem));
+        } else if (!key.localeCompare("sdfOutputData") && typeof (subObj.sdfOutputData === 'array')) {
+            subObj.sdfOutputData.forEach(ptr => {
+                if (!ptr.charAt(0).localeCompare("#")) {
+                    //ToDo
+                } else {
+                    //ToDo
+                }
+            });
         }
 
         switch (typeof (subObj[key])) {
             case 'undefined':
                 break;
             case 'object':
-                if(subObj[key]!== null){
+                if (subObj[key] !== null) {
                     resolveRef(ns, obj, subObj[key], location.concat(`/${key}`));
                 }
                 break;
