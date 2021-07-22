@@ -54,7 +54,7 @@ function unify(obj) {
  * @param {*} obj The object with unresolved references.
  * @returns An object with resolved references.
  */
-function resolveRef(ns, obj, subObj=obj, location="") {//ToDo dereference input and output data
+function resolveRef(ns, obj, subObj = obj, location = "") {//ToDo dereference input and output data
     Object.keys(subObj).forEach((key) => {
         if (!key.localeCompare("sdfRef")) {
             ptr = subObj[key];
@@ -87,20 +87,24 @@ function resolveRef(ns, obj, subObj=obj, location="") {//ToDo dereference input 
                 break;
             case 'object':
                 if (subObj[key] !== null) {
-                    resolveRef(ns, obj, subObj[key], location.concat(`/${key}`));
+                    if (Array.isArray(subObj[key])) {
+                        subObj[key].forEach(o => resolveIOData(ns, obj, o, location.concat(`/${key}`)));
+
+                    } else {
+                        resolveIOData(ns, obj, subObj[key], location.concat(`/${key}`));
+                    }
                 }
                 break;
-            case 'array':
-                subObj[key].forEach(o => resolveRef(ns, obj, o, location.concat(`/${key}`)));
 
         }
     });
     return obj;
 }
 
-function resolveIOData(ns,obj, subObj=obj, location="") {
+function resolveIOData(ns, obj, subObj = obj, location = "") {
     Object.keys(subObj).forEach((key) => {
-        if (!key.localeCompare("sdfInputData")) {
+        //ToDo: refactor to one function for sdfInputData and sdfOutputData
+        if (!key.localeCompare("sdfInputData") && Array.isArray(subObj.sdfInputData)) {
             new_data = [];
             remove = []
             subObj.sdfInputData.forEach((ptr, i) => {
@@ -112,8 +116,10 @@ function resolveIOData(ns,obj, subObj=obj, location="") {
                         remove.push(i);
                     } else {//global
                         ref = ptr.split(":");
-                        new_data.push(ns[ref[0]].concat(ref[1]));
-                        remove.push(i);
+                        if (Object.keys(ns).includes(ref[0])) {
+                            new_data.push(ns[ref[0]].concat(ref[1]));
+                            remove.push(i);
+                        }
                     }
                 }
             });
@@ -123,14 +129,32 @@ function resolveIOData(ns,obj, subObj=obj, location="") {
                 ++offset;
             }
             new_data.forEach(elem => subObj.sdfInputData.push(elem));
-        } else if (!key.localeCompare("sdfOutputData") && typeof (subObj.sdfOutputData === 'array')) {
-            subObj.sdfOutputData.forEach(ptr => {
-                if (!ptr.charAt(0).localeCompare("#")) {
-                    //ToDo
-                } else {
-                    //ToDo
+        } else if (!key.localeCompare("sdfOutputData") && Array.isArray(subObj.sdfOutputData)) {
+            console.log(typeof (subObj.sdfOutputData))
+            new_data = [];
+            remove = []
+            subObj.sdfOutputData.forEach((ptr, i) => {
+                if (typeof (ptr) === 'string') {
+                    if (!ptr.charAt(0).localeCompare("#")) {//local
+                        ptr = ptr.substring(11);
+                        new_obj = JSON.parse(JSON.stringify(pointer.get(obj, ptr)));//to get real copy of object
+                        new_data.push(new_obj);
+                        remove.push(i);
+                    } else {//global
+                        ref = ptr.split(":");
+                        if (Object.keys(ns).includes(ref[0])) {
+                            new_data.push(ns[ref[0]].concat(ref[1]));
+                            remove.push(i);
+                        }
+                    }
                 }
             });
+            offset = 0;
+            for (const i of remove) {
+                subObj.sdfOutputData.splice(i - offset, 1);
+                ++offset;
+            }
+            new_data.forEach(elem => subObj.sdfOutputData.push(elem));
         }
 
         switch (typeof (subObj[key])) {
@@ -138,11 +162,14 @@ function resolveIOData(ns,obj, subObj=obj, location="") {
                 break;
             case 'object':
                 if (subObj[key] !== null) {
-                    resolveIOData(ns, obj, subObj[key], location.concat(`/${key}`));
+                    if (Array.isArray(subObj[key])) {
+                        subObj[key].forEach(o => resolveIOData(ns, obj, o, location.concat(`/${key}`)));
+
+                    } else {
+                        resolveIOData(ns, obj, subObj[key], location.concat(`/${key}`));
+                    }
                 }
                 break;
-            case 'array':
-                subObj[key].forEach(o => resolveIOData(ns, obj, o, location.concat(`/${key}`)));
 
         }
     });
