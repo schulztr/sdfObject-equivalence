@@ -37,11 +37,14 @@ function unify(obj) {
             case 'undefined':
                 break;
             case 'object':
-                unify(obj[key]);
+                if (obj[key] !== null) {
+                    if (Array.isArray(obj[key])) {
+                        obj[key].forEach(o => unify(o));
+                    } else {
+                        unify(obj[key]);
+                    }
+                }
                 break;
-            case 'array':
-                obj[key].forEach(o => unify(o));
-
         }
     });
 

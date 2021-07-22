@@ -1,4 +1,4 @@
-const COMMON_KEYS = ["sdfRef", "sdfRequired", "description"]//ToDo remove description when resolve is implemented
+const COMMON_KEYS = ["sdfRef", "sdfRequired"]
 const DATA_KEYS = ["type", "const", "default", "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum", "multipleOf", "minLength", "maxLength", "minItems", "maxItems", "uniqueItems", "pattern", "format", "required", "properties", "unit", "readable", "writable", "observable", "nullable", "contentFormat", "sdfType", "sdfChoice"];
 const CLASS_KEYS = ["sdfObject", "sdfProperty", "sdfAction", "sdfEvent", "sdfData"]
 
@@ -122,23 +122,8 @@ function sdfEvent(key1, event1, key2, event2) {
         return false;
 
     //sdfOutputData
-    for (k1 in event1.sdfOutputData) {
-        equal = false;
-        for (k2 in event2.sdfOutputData) {
-            if (sdfIOData(k1, event1.sdfOutputData[k1], k2, event2.sdfOutputData[k2])) {
-                equal = true;
-                delete event1.sdfOutputData[k1];
-                delete event2.sdfOutputData[k2];
-                break;
-            }
-        }
-        if (!equal)
-            return false;
-    }
-    if (event2.sdfOutputData && Object.entries(event2.sdfOutputData).length != 0) {
-        console.log("Event: output data not equivalent")
+    if (!sdfIOData(event1.sdfOutputData, event2.sdfOutputData))
         return false;
-    }
 
     if (COMMON_KEYS.map(key => commonQualitiy(key, event1[key], event2[key2]).some(v => v == false))) {
         console.log("Event: common qualities not equivalent");
@@ -158,37 +143,11 @@ function sdfAction(key1, action1, key2, action2) {
         return false;
 
     //sdfInputData
-    for (k1 in action1.sdfInputData) {
-        equal = false;
-        for (k2 in action2.sdfInputData) {
-            if (sdfIOData(k1, action1.sdfInputData[k1], k2, action2.sdfInputData[k2])) {
-                equal = true;
-                delete action1.sdfInputData[k1];
-                delete action2.sdfInputData[k2];
-                break;
-            }
-        }
-        if (!equal)
-            return false;
-    }
-    if (action2.sdfInputData && Object.entries(action2.sdfInputData).length != 0)
+    if (!sdfIOData(action1.sdfInputData, action2.sdfInputData))
         return false;
 
     //sdfOutputData
-    for (k1 in action1.sdfOutputData) {
-        equal = false;
-        for (k2 in action2.sdfOutputData) {
-            if (sdfIOData(k1, action1.sdfOutputData[k1], k2, action2.sdfOutputData[k2])) {
-                equal = true;
-                delete action1.sdfOutputData[k1];
-                delete action2.sdfOutputData[k2];
-                break;
-            }
-        }
-        if (!equal)
-            return false;
-    }
-    if (action2.sdfOutputData && Object.entries(action2.sdfOutputData).length != 0)
+    if (!sdfIOData(action1.sdfOutputData, action2.sdfOutputData))
         return false;
 
     if (COMMON_KEYS.map(key => commonQualitiy(key, action1[key], action2[key])).some(v => v == false))
@@ -209,7 +168,7 @@ function commonQualitiy(key, quality1, quality2) {
 
     switch (key) {
         case "sdfRef":
-            return quality1.localeCompare(quality2)==0
+            return quality1.localeCompare(quality2) == 0
         case "sdfRequired":
             return sdfRequired(quality1, quality2);
         case "description":
@@ -273,11 +232,38 @@ function dataQuality(key, quality1, quality2) {
 }
 
 
-function sdfIOData(key1, IOData1, key2, IOData2) {
-    return true;
-}
+function sdfIOData(IOData1, IOData2) {
+    if (!(IOData1 || IOData2))
+        return true;
 
-function sdfRef(ref1, ref2) {
+    if (!(IOData1 && IOData2))
+        return false;
+
+    if (!Array.isArray(IOData1))
+        IOData1 = [IOData1];
+    if (!Array.isArray(IOData2))
+        IOData2 = [IOData2]
+
+    for (const data1 of IOData1) {
+        equal = false;
+        for (const data2 of IOData1) {
+            if (typeof (data1) === 'string' && typeof (data2) === `string` && !data1.localeCompare(data2)) {
+                equal = true;
+                break;
+            }
+            if (dq_items(data1, data2)) {
+                equal = true;
+                break;
+            }
+        }
+        if (!equal) {
+            console.log(`IOData ${JSON.stringify(data1, null, 4)} differs`)
+            return false;
+        }
+        equal = false;
+    }
+
+
     return true;
 }
 
@@ -348,7 +334,7 @@ function dq_items(item1, item2) {
         return false;
 
     for (i = 0; i < keys1.length; i++) {
-        if (!keys1[i].localeCompare(keys2[i]))
+        if (keys1[i].localeCompare(keys2[i]))
             return false;
 
         key = keys1[i]
