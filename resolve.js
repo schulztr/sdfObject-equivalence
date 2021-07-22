@@ -1,7 +1,7 @@
 var pointer = require('json-pointer');
 
 exports.resolve = function (ns, obj) {
-    return unify(resolveRef(ns, obj, obj, ""));
+    return resolveIOData(ns, unify(resolveRef(ns, obj)));
 }
 
 /**
@@ -54,7 +54,7 @@ function unify(obj) {
  * @param {*} obj The object with unresolved references.
  * @returns An object with resolved references.
  */
-function resolveRef(ns, obj, subObj, location) {//ToDo dereference input and output data
+function resolveRef(ns, obj, subObj=obj, location="") {//ToDo dereference input and output data
     Object.keys(subObj).forEach((key) => {
         if (!key.localeCompare("sdfRef")) {
             ptr = subObj[key];
@@ -81,8 +81,27 @@ function resolveRef(ns, obj, subObj, location) {//ToDo dereference input and out
                 ref = ptr.split(":");
                 subObj.sdfRef = ns[ref[0]].concat(ref[1]);
             }
-        } else if (!key.localeCompare("sdfInputData")) {
-            console.log("hit");
+        }
+
+        switch (typeof (subObj[key])) {
+            case 'undefined':
+                break;
+            case 'object':
+                if (subObj[key] !== null) {
+                    resolveRef(ns, obj, subObj[key], location.concat(`/${key}`));
+                }
+                break;
+            case 'array':
+                subObj[key].forEach(o => resolveRef(ns, obj, o, location.concat(`/${key}`)));
+
+        }
+    });
+    return obj;
+}
+
+function resolveIOData(ns,obj, subObj=obj, location="") {
+    Object.keys(subObj).forEach((key) => {
+        if (!key.localeCompare("sdfInputData")) {
             new_data = [];
             remove = []
             subObj.sdfInputData.forEach((ptr, i) => {
@@ -118,11 +137,11 @@ function resolveRef(ns, obj, subObj, location) {//ToDo dereference input and out
                 break;
             case 'object':
                 if (subObj[key] !== null) {
-                    resolveRef(ns, obj, subObj[key], location.concat(`/${key}`));
+                    resolveIOData(ns, obj, subObj[key], location.concat(`/${key}`));
                 }
                 break;
             case 'array':
-                subObj[key].forEach(o => resolveRef(ns, obj, o, location.concat(`/${key}`)));
+                subObj[key].forEach(o => resolveIOData(ns, obj, o, location.concat(`/${key}`)));
 
         }
     });
