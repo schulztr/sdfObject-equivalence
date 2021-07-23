@@ -1,6 +1,6 @@
 # sdfObject-equivalence
 
-This tool tries to determine equivalence between two sdfObjects and is still work in progress.
+This tool tries to determine equivalence between two `sdfObject`s.
 
 ## Usage
 
