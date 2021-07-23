@@ -1,3 +1,5 @@
+var synonyms = require("synonyms");
+
 const COMMON_KEYS = ["sdfRef", "sdfRequired"]
 const DATA_KEYS = ["type", "const", "default", "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum", "multipleOf", "minLength", "maxLength", "minItems", "maxItems", "uniqueItems", "pattern", "format", "required", "properties", "unit", "readable", "writable", "observable", "nullable", "contentFormat", "sdfType", "sdfChoice", "items"];
 const CLASS_KEYS = ["sdfObject", "sdfProperty", "sdfAction", "sdfEvent", "sdfData"]
@@ -5,13 +7,14 @@ const CLASS_KEYS = ["sdfObject", "sdfProperty", "sdfAction", "sdfEvent", "sdfDat
 var verbose;
 
 exports.sdfObject = function (obj1, obj2, verbose_l) {
+    console.log(synonyms("precision", "n"))
     verbose = verbose_l
     key1 = Object.keys(obj1)[0];
     key2 = Object.keys(obj2)[0];
 
     //class name
     if (!className(key1, key2)) {
-        if(verbose)
+        if (verbose)
             console.log(`Name ${key1} and ${key2} not equal`)
         return false;
     }
@@ -31,14 +34,14 @@ exports.sdfObject = function (obj1, obj2, verbose_l) {
             }
         }
         if (!equal) {
-            if(verbose)
+            if (verbose)
                 console.log(`Property ${key1} differs`);
             return false;
         }
         equal = false;
     }
     if (obj2.sdfProperty && Object.entries(obj2.sdfProperty).length != 0) {
-        if(verbose)
+        if (verbose)
             console.log(`sdfProperties not equal`);
         return false;
     }
@@ -57,14 +60,14 @@ exports.sdfObject = function (obj1, obj2, verbose_l) {
             }
         }
         if (!equal) {
-            if(verbose)
+            if (verbose)
                 console.log(`Event ${key1} differs`);
             return false;
         }
         equal = false;
     }
     if (obj2.sdfEvent && Object.entries(obj2.sdfEvent).length != 0) {
-        if(verbose)
+        if (verbose)
             console.log(`${Object.entries(obj.sdfEvent).length} event(s) differ`)
         return false;
     }
@@ -83,14 +86,14 @@ exports.sdfObject = function (obj1, obj2, verbose_l) {
             }
         }
         if (!equal) {
-            if(verbose)
+            if (verbose)
                 console.log(`Action ${key1} differs`)
             return false;
         }
         equal = false;
     }
     if (obj2.sdfAction && Object.entries(obj2.sdfAction).length != 0) {
-        if(verbose)
+        if (verbose)
             console.log(`${Object.entries(obj2.sdfAction).length} action(s) differ`)
         return false;
     }
@@ -99,7 +102,7 @@ exports.sdfObject = function (obj1, obj2, verbose_l) {
 
     //common qualities
     if (COMMON_KEYS.map(key => commonQualitiy(key, obj1[key], obj2[key])).some(v => v == false)) {
-        if(verbose)
+        if (verbose)
             console.log(`common qualities from ${key1} differ`)
         return false;
     }
@@ -110,7 +113,9 @@ exports.sdfObject = function (obj1, obj2, verbose_l) {
 function className(name1, name2) {//TODO: use label and synonymes
     name1 = unifyName(name1);
     name2 = unifyName(name2);
-    return !(name1.localeCompare(name2, 'en', { sensitivity: 'base' }));
+    return !(name1.localeCompare(name2, 'en', { sensitivity: 'base' })) ||
+        (Array.isArray(synonyms(name1, "n")) && synonyms(name1, "n").includes(name2)) ||
+        (Array.isArray(synonyms(name2, "n")) && synonyms(name2, "n").includes(name1));
 }
 
 function sdfProperty(key1, property1, key2, property2) {
@@ -121,7 +126,7 @@ function sdfProperty(key1, property1, key2, property2) {
         return false;
 
     if (DATA_KEYS.map(key => dataQuality(key, property1[key], property2[key])).some(v => v == false)) {
-        if(verbose)
+        if (verbose)
             console.log(`property ${key1} not equivalent`);
         return false;
     }
@@ -138,13 +143,13 @@ function sdfEvent(key1, event1, key2, event2) {
         return false;
 
     if (COMMON_KEYS.map(key => commonQualitiy(key, event1[key], event2[key2]).some(v => v == false))) {
-        if(verbose)
+        if (verbose)
             console.log("Event: common qualities not equivalent");
         return false;
     }
 
     if (DATA_KEYS.map(key => dataQuality(key, event1[key], event2[key])).some(v => v == false)) {
-        if(verbose)
+        if (verbose)
             console.log("Event: data qualities not equivalent");
         return false;
     }
@@ -271,7 +276,7 @@ function sdfIOData(IOData1, IOData2) {
             }
         }
         if (!equal) {
-            if(verbose)
+            if (verbose)
                 console.log(`IOData ${JSON.stringify(data1, null, 4)} differs`)
             return false;
         }
@@ -447,7 +452,7 @@ function dq_properties(prop1, prop2) {
 
 function sdfChoice(choice1, choice2) {
     if (Object.entries(choice1).length != Object.entries(choice2).length) {
-        if(verbose)
+        if (verbose)
             console.log(`sdfChoice: number of elements differs`);
         return false;
     }
@@ -478,7 +483,7 @@ function sdfChoice(choice1, choice2) {
             }
         }
         if (!equal) {
-            if(verbose)
+            if (verbose)
                 console.log(`sdfChoice: ${JSON.stringify(choice1[key1])} differs`);
             return false;
         }
