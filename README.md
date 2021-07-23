@@ -13,7 +13,7 @@ This tool tries to determine equivalence between two sdfObjects and is still wor
 | sdfInputData, sdfOutputData                                  | if all *common qualities* and *data qualities* are equal     |
 | **common qualities**                                         |                                                              |
 | description                                                  | ignore                                                       |
-| label                                                        | use for class name equivalence                               |
+| label                                                        | ignore                                                       |
 | $comment                                                     | ignore                                                       |
 | sdfRef                                                       | - for copying sdfData definitions within the same sdf file: equality of the resulting object after resolving and merging like described in [section 4.4](https://datatracker.ietf.org/doc/html/draft-ietf-asdf-sdf-07#section-4.4)<br /> - else: same (resolved) namespace and fragment |
 | sdfRequired                                                  | if all sdfRefs are equal (regardless of order)               |
@@ -37,5 +37,4 @@ This tool tries to determine equivalence between two sdfObjects and is still wor
 
 - compare as lowercase string without `-`, `.` or `_`
 
-- equal if name or label has the same adapted string
 
