@@ -133,7 +133,6 @@ function resolveIOData(ns, obj, subObj = obj, location = "") {
             }
             new_data.forEach(elem => subObj.sdfInputData.push(elem));
         } else if (!key.localeCompare("sdfOutputData") && Array.isArray(subObj.sdfOutputData)) {
-            console.log(typeof (subObj.sdfOutputData))
             new_data = [];
             remove = []
             subObj.sdfOutputData.forEach((ptr, i) => {

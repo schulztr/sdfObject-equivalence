@@ -2,6 +2,12 @@
 
 This tool tries to determine equivalence between two sdfObjects and is still work in progress.
 
+## Usage
+
+- clone Repository
+- install dependencies: `npm install`
+- run: `node sdfObject-equivalence <sdf-file1> <sdf-file2>`
+
 ## Equivalence
 
 | SDF quality                                                  | Equivalence                                                  |
@@ -36,5 +42,4 @@ This tool tries to determine equivalence between two sdfObjects and is still wor
 ### Class Name Equivalence
 
 - compare as lowercase string without `-`, `.` or `_`
-
 
