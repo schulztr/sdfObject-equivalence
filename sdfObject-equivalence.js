@@ -5,7 +5,8 @@ const cmp = require('./comparison');
 const res = require('./resolve');
 
 const optionDefinitions = [
-    { name: 'input', type: String, multiple: true, defaultOption: true}
+    { name: 'input', type: String, multiple: true, defaultOption: true},
+    { name: 'verbose', alias: 'v', type: Boolean}
 ]
 const options = commandLineArgs(optionDefinitions);
 
@@ -39,4 +40,4 @@ const namespace2 = getNamespace(sdfFile2);
 const sdfObj1 = getObject(sdfFile1);
 const sdfObj2 = getObject(sdfFile2);
 
-console.log(cmp.sdfObject(res.resolve(namespace1, sdfObj1), res.resolve(namespace2, sdfObj2)));
+console.log(cmp.sdfObject(res.resolve(namespace1, sdfObj1), res.resolve(namespace2, sdfObj2), options.verbose));
