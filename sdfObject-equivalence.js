@@ -6,7 +6,7 @@ const res = require('./resolve');
 
 const optionDefinitions = [
     { name: 'input', type: String, multiple: true, defaultOption: true},
-    { name: 'verbose', alias: 'v', type: Boolean}
+    { name: 'verbose', alias: 'v', type: Boolean, defaultValue: false}
 ]
 const options = commandLineArgs(optionDefinitions);
 
