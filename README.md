@@ -8,6 +8,12 @@ This tool tries to determine equivalence between two sdfObjects and is still wor
 - install dependencies: `npm install`
 - run: `node [-v] sdfObject-equivalence <sdf-file1> <sdf-file2>`
 
+### check_with_playround.sh
+
+Compares the given `sdfObject`to the `sdfObject`s from the [playground](https://github.com/one-data-model/playground). The script clones the playground into the current directory.
+
+Usage: `./check_with_playground.sh <sdf-file>`
+
 ## Equivalence
 
 | SDF quality                                                  | Equivalence                                                  |
