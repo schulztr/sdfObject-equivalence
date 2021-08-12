@@ -7,7 +7,6 @@ const CLASS_KEYS = ["sdfObject", "sdfProperty", "sdfAction", "sdfEvent", "sdfDat
 var verbose;
 
 exports.sdfObject = function (obj1, obj2, verbose_l) {
-    console.log(synonyms("precision", "n"))
     verbose = verbose_l
     key1 = Object.keys(obj1)[0];
     key2 = Object.keys(obj2)[0];
@@ -204,7 +203,7 @@ function dataQuality(key, quality1, quality2) {
         return false;
     }
 
-    number_cmp = ["minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum", "multipleOf", "minLength", "maxLength", "minItems", "maxItems", "uniqueItems", "scaleMinimum", "scaleMaximum", "readable", "writable", "nullable"];//number or boolean
+    number_cmp = ["minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum", "multipleOf", "minLength", "maxLength", "minItems", "maxItems", "uniqueItems", "scaleMinimum", "scaleMaximum", "observable", "readable", "writable", "nullable"];//number or boolean
     str_cmp = ["type", "pattern", "format", "unit", "contentFormat"]//string
     value_cmp = ["const", "default"]//allowed value
 
