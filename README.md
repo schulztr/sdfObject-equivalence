@@ -6,7 +6,7 @@ This tool tries to determine equivalence between two `sdfObject`s.
 
 - clone Repository
 - install dependencies: `npm install`
-- run: `node [-v] sdfObject-equivalence <sdf-file1> <sdf-file2>`
+- run: `node sdfObject-equivalence [-v] <sdf-file1> <sdf-file2>`
 
 ### check_with_playround.sh
 
