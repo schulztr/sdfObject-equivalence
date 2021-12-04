@@ -10,6 +10,16 @@ const optionDefinitions = [
 ]
 const options = commandLineArgs(optionDefinitions);
 
+function main(sdfFile1, sdfFile2, verbose){
+    const namespace1 = getNamespace(sdfFile1);
+    const namespace2 = getNamespace(sdfFile2);
+
+    const sdfObj1 = getObject(sdfFile1);
+    const sdfObj2 = getObject(sdfFile2);
+
+    return cmp.sdfObject(res.resolve(namespace1, sdfObj1), res.resolve(namespace2, sdfObj2), verbose);
+}
+
 function getObject(sdfFile) {
     if (!sdfFile) {
         throw Error("Need two arguments");
@@ -34,10 +44,4 @@ function getNamespace(sdfFile) {
 const sdfFile1 = JSON.parse(fs.readFileSync(options.input[0]));
 const sdfFile2 = JSON.parse(fs.readFileSync(options.input[1]));
 
-const namespace1 = getNamespace(sdfFile1);
-const namespace2 = getNamespace(sdfFile2);
-
-const sdfObj1 = getObject(sdfFile1);
-const sdfObj2 = getObject(sdfFile2);
-
-console.log(cmp.sdfObject(res.resolve(namespace1, sdfObj1), res.resolve(namespace2, sdfObj2), options.verbose));
+console.log(main(sdfFile1, sdfFile2, options.verbose));
