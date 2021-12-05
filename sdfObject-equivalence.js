@@ -41,7 +41,9 @@ function getNamespace(sdfFile) {
     return sdfFile.namespace;
 }
 
-const sdfFile1 = JSON.parse(fs.readFileSync(options.input[0]));
-const sdfFile2 = JSON.parse(fs.readFileSync(options.input[1]));
+if (options.input) {
+    const sdfFile1 = JSON.parse(fs.readFileSync(options.input[0]));
+    const sdfFile2 = JSON.parse(fs.readFileSync(options.input[1]));
 
-console.log(main(sdfFile1, sdfFile2, options.verbose));
+    console.log(main(sdfFile1, sdfFile2, options.verbose));
+}
