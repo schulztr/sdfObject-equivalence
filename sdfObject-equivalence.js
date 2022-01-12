@@ -10,7 +10,7 @@ const optionDefinitions = [
 ]
 const options = commandLineArgs(optionDefinitions);
 
-function main(sdfFile1, sdfFile2, verbose){
+module.exports = function main(sdfFile1, sdfFile2, verbose){
     const namespace1 = getNamespace(sdfFile1);
     const namespace2 = getNamespace(sdfFile2);
 
