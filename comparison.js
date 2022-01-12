@@ -141,7 +141,7 @@ function sdfEvent(key1, event1, key2, event2) {
     if (!sdfIOData(event1.sdfOutputData, event2.sdfOutputData))
         return false;
 
-    if (COMMON_KEYS.map(key => commonQualitiy(key, event1[key], event2[key2]).some(v => v == false))) {
+    if (COMMON_KEYS.map(key => commonQualitiy(key, event1[key], event2[key2])).some(v => v == false)) {
         if (verbose)
             console.log("Event: common qualities not equivalent");
         return false;
