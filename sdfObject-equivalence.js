@@ -1,5 +1,6 @@
 const fs = require('fs');
 const commandLineArgs = require('command-line-args');
+const deepcopy = require('deepcopy');
 
 const cmp = require('./comparison');
 const res = require('./resolve');
@@ -10,7 +11,10 @@ const optionDefinitions = [
 ]
 const options = commandLineArgs(optionDefinitions);
 
-module.exports = function main(sdfFile1, sdfFile2, verbose){
+module.exports = function main(arg_sdfFile1, arg_sdfFile2, verbose){
+    var sdfFile1 = deepcopy(arg_sdfFile1);
+    var sdfFile2 = deepcopy(arg_sdfFile2);
+
     const namespace1 = getNamespace(sdfFile1);
     const namespace2 = getNamespace(sdfFile2);
 

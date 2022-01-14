@@ -11,6 +11,7 @@
   "license": "MIT",
   "dependencies": {
     "command-line-args": "^5.2.0",
+    "deepcopy": "^2.1.0",
     "json-pointer": "^0.6.1",
     "synonyms": "^1.0.1"
   }
