@@ -11,7 +11,7 @@ const optionDefinitions = [
 ]
 const options = commandLineArgs(optionDefinitions);
 
-module.exports = function main(arg_sdfFile1, arg_sdfFile2, verbose){
+function main(arg_sdfFile1, arg_sdfFile2, verbose){
     var sdfFile1 = deepcopy(arg_sdfFile1);
     var sdfFile2 = deepcopy(arg_sdfFile2);
 
@@ -23,6 +23,8 @@ module.exports = function main(arg_sdfFile1, arg_sdfFile2, verbose){
 
     return cmp.sdfObject(res.resolve(namespace1, sdfObj1), res.resolve(namespace2, sdfObj2), verbose);
 }
+
+exports.main = main;
 
 function getObject(sdfFile) {
     if (!sdfFile) {

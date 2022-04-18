@@ -264,7 +264,7 @@ function sdfIOData(IOData1, IOData2) {
 
     for (const data1 of IOData1) {
         equal = false;
-        for (const data2 of IOData1) {
+        for (const data2 of IOData2) {
             if (typeof (data1) === 'string' && typeof (data2) === `string` && !data1.localeCompare(data2)) {
                 equal = true;
                 break;
