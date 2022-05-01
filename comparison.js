@@ -6,7 +6,15 @@ const CLASS_KEYS = ["sdfObject", "sdfProperty", "sdfAction", "sdfEvent", "sdfDat
 
 var verbose;
 
-exports.sdfObject = function (obj1, obj2, verbose_l) {
+/**
+ * 
+ * @param {*} obj1 sdfObject 2
+ * @param {*} obj2 sdfObject 1
+ * @param {*} verbose_l print information about equivalence
+ * @param {*} sort create object sort that is a sorted version of obj2, so that obj1 and obj2 are in the same order.
+ * @returns Are sdfObject 1 and sdfObject 2 equivalent.
+ */
+exports.sdfObject = function (obj1, obj2, verbose_l, sort) {
     verbose = verbose_l
     key1 = Object.keys(obj1)[0];
     key2 = Object.keys(obj2)[0];
@@ -22,11 +30,17 @@ exports.sdfObject = function (obj1, obj2, verbose_l) {
     obj2 = obj2[key2];
 
     //sdfProperty
+    if(sort){
+        sort.sdfProperty = {};
+    }
     for (const key1 in obj1.sdfProperty) {
         equal = false;
         for (const key2 in obj2.sdfProperty) {
             if (sdfProperty(key1, obj1.sdfProperty[key1], key2, obj2.sdfProperty[key2])) {
                 equal = true;
+                if(sort){
+                    sort.sdfProperty[key2]=obj2.sdfProperty[key2]
+                }
                 delete obj1.sdfProperty[key1];//ToD: Property and Pro_perty in one object?
                 delete obj2.sdfProperty[key2];
                 break;
@@ -48,11 +62,17 @@ exports.sdfObject = function (obj1, obj2, verbose_l) {
     delete obj2.sdfProperty;
 
     //sdfEvent
+    if(sort){
+        sort.sdfEvent = {};
+    }
     for (const key1 in obj1.sdfEvent) {
         equal = false;
         for (const key2 in obj2.sdfEvent) {
             if (sdfEvent(key1, obj1.sdfEvent[key1], key2, obj1.sdfEvent[key2])) {
                 equal = true;
+                if(sort){
+                    sort.sdfEvent[key2] = obj2.sdfEvent[key2];
+                }
                 delete obj1.sdfEvent[key1];
                 delete obj2.sdfEvent[key2];
                 break;
@@ -74,11 +94,17 @@ exports.sdfObject = function (obj1, obj2, verbose_l) {
     delete obj2.sdfEvent;
 
     //sdfAction
+    if(sort){
+        sort.sdfAction = {};
+    }
     for (const key1 in obj1.sdfAction) {
         equal = false;
         for (const key2 in obj2.sdfAction) {
             if (sdfAction(key1, obj1.sdfAction[key1], key2, obj2.sdfAction[key2])) {
                 equal = true;
+                if(sort){
+                    sort.sdfAction[key2] = obj2.sdfAction[key2];
+                }
                 delete obj1.sdfAction[key1];
                 delete obj2.sdfAction[key2];
                 break;
@@ -273,6 +299,7 @@ function sdfIOData(IOData1, IOData2) {
                 equal = true;
                 break;
             }
+            console.log(JSON.stringify(data2, null, 4))
         }
         if (!equal) {
             if (verbose)

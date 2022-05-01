@@ -11,7 +11,7 @@ const optionDefinitions = [
 ]
 const options = commandLineArgs(optionDefinitions);
 
-function main(arg_sdfFile1, arg_sdfFile2, verbose){
+function main(arg_sdfFile1, arg_sdfFile2, verbose, sortedObj){
     var sdfFile1 = deepcopy(arg_sdfFile1);
     var sdfFile2 = deepcopy(arg_sdfFile2);
 
@@ -21,7 +21,12 @@ function main(arg_sdfFile1, arg_sdfFile2, verbose){
     const sdfObj1 = getObject(sdfFile1);
     const sdfObj2 = getObject(sdfFile2);
 
-    return cmp.sdfObject(res.resolve(namespace1, sdfObj1), res.resolve(namespace2, sdfObj2), verbose);
+    if(!typeof sortedObj == 'undefined' && 
+       !typeof sortedObj == 'object' && Object.keys(sortedObj)===0){
+        console.error(`sortedObj ist optional but needs to be an empty object.`)
+    }
+
+    return cmp.sdfObject(res.resolve(namespace1, sdfObj1), res.resolve(namespace2, sdfObj2), verbose, sortedObj);
 }
 
 exports.main = main;
