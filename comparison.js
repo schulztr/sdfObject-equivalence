@@ -7,10 +7,10 @@ const CLASS_KEYS = ["sdfObject", "sdfProperty", "sdfAction", "sdfEvent", "sdfDat
 var verbose;
 
 /**
- * 
+ * Compare two sdfObjects based on draft-ietf-asdf-sdf-07 (https://www.ietf.org/archive/id/draft-ietf-asdf-sdf-07.html).
  * @param {*} obj1 sdfObject 2
  * @param {*} obj2 sdfObject 1
- * @param {*} verbose_l print information about equivalence
+ * @param {*} verbose_l print information about equivalence.
  * @param {*} sort create object sort that is a sorted version of obj2, so that obj1 and obj2 are in the same order.
  * @returns Are sdfObject 1 and sdfObject 2 equivalent.
  */
@@ -135,6 +135,12 @@ exports.sdfObject = function (obj1, obj2, verbose_l, sort) {
     return true;
 }
 
+/**
+ * Compare Class Names using synonyms.
+ * @param {*} name1 name 1
+ * @param {*} name2 name 2 
+ * @returns Are name 1 and name 2 equal?
+ */
 function className(name1, name2) {//TODO: use label and synonymes
     name1 = unifyName(name1);
     name2 = unifyName(name2);
@@ -143,6 +149,14 @@ function className(name1, name2) {//TODO: use label and synonymes
         (Array.isArray(synonyms(name2, "n")) && synonyms(name2, "n").includes(name1));
 }
 
+/**
+ * Compare the given Properties, named by the given Class Names.
+ * @param {String} key1 Class Name 1
+ * @param {Object} property1 Property 1
+ * @param {String} key2 Class Name 2
+ * @param {Object} property2 Property 2
+ * @returns Are both sdfProperties equal?
+ */
 function sdfProperty(key1, property1, key2, property2) {
     if (!className(key1, key2))
         return false;
@@ -159,6 +173,14 @@ function sdfProperty(key1, property1, key2, property2) {
     return true;
 }
 
+/**
+ * Compare the given Events, named by the given Class Names.
+ * @param {String} key1 Class Name 1
+ * @param {Object} event1 Event 1 
+ * @param {String} key2 Class Name 2
+ * @param {Object} event2 Event 2
+ * @returns Are both sdfEvents equal?
+ */
 function sdfEvent(key1, event1, key2, event2) {
     if (!className(key1, key2))
         return false;
@@ -182,6 +204,14 @@ function sdfEvent(key1, event1, key2, event2) {
     return true;
 }
 
+/**
+ * Compare the given Actions, named by the given Class Names.
+ * @param {String} key1 Class Name 1
+ * @param {Object} action1 Action 1
+ * @param {String} key2 Class Name 2
+ * @param {Object} action2 Action 2
+ * @returns Are both sdfActions equal?
+ */
 function sdfAction(key1, action1, key2, action2) {
     if (!className(key1, key2))
         return false;
@@ -203,6 +233,12 @@ function sdfAction(key1, action1, key2, action2) {
     return true;
 }
 
+/**
+ * @param {String} key The Name of the Qualities
+ * @param {*} quality1 Quality 1
+ * @param {*} quality2 Quality 2
+ * @returns Are both Qualities equal?
+ */
 function commonQualitiy(key, quality1, quality2) {
     if (!(quality1 || quality2))
         return true;
@@ -222,6 +258,12 @@ function commonQualitiy(key, quality1, quality2) {
     }
 }
 
+/**
+ * @param {String} key The Name of the Qualities
+ * @param {*} quality1 Quality 1
+ * @param {*} quality2 Quality 2
+ * @returns Are both Qualities equal?
+ */
 function dataQuality(key, quality1, quality2) {
     if (quality1 == null && quality2 == null)
         return true;
@@ -275,7 +317,13 @@ function dataQuality(key, quality1, quality2) {
     }
 }
 
-
+/**
+ * Compare to Qualities representing either an sdfInputData or an sdfOutputData.
+ * 
+ * @param {Object} IOData1 Quality 1
+ * @param {Object} IOData2 Quality 2
+ * @returns Are both sdfInputDatas or sdfOutputDatas equal?
+ */
 function sdfIOData(IOData1, IOData2) {
     if (!(IOData1 || IOData2))
         return true;
@@ -313,6 +361,12 @@ function sdfIOData(IOData1, IOData2) {
     return true;
 }
 
+/**
+ * Compare two arrays representing a sdfRequired.
+ * @param {Array} req1 sdfRequired 1
+ * @param {Array} req2 sdfRequired 2
+ * @returns Require both arrays the same qualities?
+ */
 function sdfRequired(req1, req2) {
     if (!(req1 || req2))
         return true;
@@ -349,6 +403,12 @@ function sdfRequired(req1, req2) {
     return true;
 }
 
+/**
+ * Compare single items of a sdfRequired-Array.
+ * @param {String} p1 item 1
+ * @param {String} p2 item 2
+ * @returns Are both items equal?
+ */
 function req_items(p1, p2) {
     if (!(p1 || p2))
         return true;
@@ -366,6 +426,12 @@ function req_items(p1, p2) {
     }).every(v => v == true);
 }
 
+/**
+ * Compare the data quality items.
+ * @param {Object} item1 items 1
+ * @param {Object} item2 items 2
+ * @returns Are both items equal?
+ */
 function dq_items(item1, item2) {
     if (!(item1 || item2))
         return true;
@@ -400,6 +466,12 @@ function dq_items(item1, item2) {
     return true;
 }
 
+/**
+ * Compare the data quality required.
+ * @param {Array} req1 required 1
+ * @param {Array} req2 required 2
+ * @returns Are both required-arrays equal?
+ */
 function dq_required(req1, req2) {
     if (!(req1 || req2))
         return true;
@@ -421,6 +493,12 @@ function dq_required(req1, req2) {
     return true;
 }
 
+/**
+ * Compare the data quality properties.
+ * @param {Object} prop1 properties 1
+ * @param {Object} prop2 properties 2
+ * @returns Are both properties equal?
+ */
 function dq_properties(prop1, prop2) {
     if (!(prop1 || prop2))
         return true;
@@ -476,6 +554,12 @@ function dq_properties(prop1, prop2) {
     return true;
 }
 
+/**
+ * Compare two sdfChoices.
+ * @param {Object} choice1 sdfChoice 1
+ * @param {Object} choice2 sdfChoice 2
+ * @returns Are both sdfChoices equal?
+ */
 function sdfChoice(choice1, choice2) {
     if (Object.entries(choice1).length != Object.entries(choice2).length) {
         if (verbose)
@@ -518,6 +602,11 @@ function sdfChoice(choice1, choice2) {
     return true;
 }
 
+/**
+ * Unify Class Name.
+ * @param {String} name Class Name
+ * @returns unified Class Name
+ */
 function unifyName(name) {
     return name.replace(/(-|\.|_)/g, '').toLowerCase();
 }

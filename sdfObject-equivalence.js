@@ -11,6 +11,14 @@ const optionDefinitions = [
 ]
 const options = commandLineArgs(optionDefinitions);
 
+/**
+ * Compares sdfObjects based on draft-ietf-asdf-sdf-07 (https://www.ietf.org/archive/id/draft-ietf-asdf-sdf-07.html).
+ * @param {Object} arg_sdfFile1 sdf file 1
+ * @param {Object} arg_sdfFile2 sdf file 2
+ * @param {Boolean} verbose Print information about the comparison.
+ * @param {Object} sortedObj An empty Object. If both objects are equal this object represents an sorted version of object 2 in order of object 1. 
+ * @returns {Boolean} Weather the sdfObjects are equal.
+ */
 function main(arg_sdfFile1, arg_sdfFile2, verbose, sortedObj){
     var sdfFile1 = deepcopy(arg_sdfFile1);
     var sdfFile2 = deepcopy(arg_sdfFile2);
@@ -31,6 +39,11 @@ function main(arg_sdfFile1, arg_sdfFile2, verbose, sortedObj){
 
 exports.main = main;
 
+/**
+ * Extracts the sdfObject from the sdfFile.
+ * @param {Object} sdfFile the sdf file
+ * @returns {Object} the sdfObject
+ */
 function getObject(sdfFile) {
     if (!sdfFile) {
         throw Error("Need two arguments");
@@ -42,6 +55,11 @@ function getObject(sdfFile) {
     return sdfFile.sdfObject
 }
 
+/**
+ * Extracts the namespace from the sdfFile.
+ * @param {Object} sdfFile the sdf file
+ * @returns {Object} the extracted namespace.
+ */
 function getNamespace(sdfFile) {
     if(!sdfFile)
         throw Error("Need two arguments");
